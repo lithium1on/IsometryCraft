@@ -33,12 +33,10 @@ dependencies {
     implementation "net.fabricmc:fabric-loader:${project.loader_version}"
     implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
-    modClientImplementation("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") {
-        exclude(group: "net.fabricmc.fabric-api")
-    }
-    // Mod Menu is optional at runtime, but is needed on the client compile classpath
-    // for its configuration-screen entrypoint.
-    modClientCompileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
+    // Minecraft 26.3 uses Loom's standard implementation configuration for mods.
+    implementation "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}"
+    // Mod Menu is only needed to compile the optional config-screen entrypoint.
+    modCompileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
 }
 
 processResources {
