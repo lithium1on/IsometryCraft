@@ -48,8 +48,8 @@ public abstract class MinecraftPickMixin {
         }
 
         MouseHandler mouse = client.mouseHandler;
-        double ndcX = (2.0 * mouse.xpos() / width) - 1.0;
-        double ndcY = 1.0 - (2.0 * mouse.ypos() / height);
+        double ndcX = (2.0 * mouse.getScaledXPos(window) / width) - 1.0;
+        double ndcY = 1.0 - (2.0 * mouse.getScaledYPos(window) / height);
 
         float size = IsometryCraftClient.isometricSize;
         float aspect = (float) window.getWidth() / Math.max(1, window.getHeight());
