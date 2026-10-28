@@ -44,7 +44,7 @@ public abstract class MouseMixin {
     }
 
     @Inject(method = "onMove", at = @At("HEAD"), cancellable = true)
-    private void isometrycraft$panWorld(long handle, double newX, double newY, CallbackInfo ci) {
+    private void isometrycraft$panWorld(long handle, double newX, double newY, double deltaX, double deltaY, CallbackInfo ci) {
         if (!IsometryCraftClient.isIsometric
                 || !IsometryCraftClient.isMiddleMouseDown
                 || this.minecraft.player == null) {
@@ -52,8 +52,8 @@ public abstract class MouseMixin {
         }
 
         ci.cancel();
-        double dx = newX - IsometryCraftClient.lastMouseX;
-        double dy = newY - IsometryCraftClient.lastMouseY;
+        double dx = deltaX;
+        double dy = deltaY;
         double sensitivity = 0.05;
 
         double yawRad = Math.toRadians(IsometryCraftClient.cameraYaw);
