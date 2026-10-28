@@ -41,8 +41,8 @@ public abstract class MinecraftPickMixin {
 
         Camera camera = client.gameRenderer.mainCamera();
         Window window = client.getWindow();
-        int width = window.getScreenWidth();
-        int height = window.getScreenHeight();
+        int width = window.getGuiScaledWidth();
+        int height = window.getGuiScaledHeight();
         if (width <= 0 || height <= 0) {
             return;
         }
