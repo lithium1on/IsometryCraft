@@ -1,23 +1,32 @@
-# IsometryCraft
-A Fabric mod that lets you play Minecraft in a true isometric perspective.
+# IsometryCraft — Minecraft 26.3 port
+
+A Fabric client mod that lets you experience Minecraft from an isometric perspective.
 
 ## Features
 
-- Isometric camera
-- Adjustable zoom
-- Unlocked mouse
-- Toggle between vanilla and isometric view
-- Smooth camera movement
+- Isometric camera with orthographic projection
+- Adjustable zoom (mouse wheel while in isometric mode)
+- Toggle between normal and isometric camera
+- Keyboard controls for yaw and pitch
+- Optional camera-height lock and HUD overlay
+- Configuration screen supplied by Cloth Config and exposed through Mod Menu
 
 ## Requirements
 
-- Minecraft 1.21.1
-- Fabric Loader (>=0.19.2)
-- Fabric API (newest version)
+- Minecraft Java Edition 26.3
+- Java 25
+- Fabric Loader and Fabric API for 26.3
+- Cloth Config API 26.3.159+fabric
+- Mod Menu 21.0.0 (optional, for the Mods menu entry)
 
-## Installation
+## Controls
 
-1. Install Fabric Loader 
-2. Install Fabric API 
-3. Put the mod into the `mods` folder.
-4. Launch Minecraft.
+| Key | Action |
+| --- | --- |
+| I | Toggle isometric view |
+| Y | Toggle camera height lock |
+| Left / Right Arrow | Rotate by 45 degrees |
+| Up / Down Arrow | Change camera pitch |
+| O | Open configuration |
+
+The configuration screen is available from Mod Menu when it is installed. Settings are stored in `config/isometrycraft_client.json`.

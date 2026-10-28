@@ -1,7 +1,10 @@
 {
   "key.isometrycraft.toggle_iso": "Toggle Isometric Mode",
   "key.isometrycraft.lock_y": "Toggle Camera Y Lock",
-  "key.isometrycraft.rotate_left": "Rotate 90° (Yaw) Left",
-  "key.isometrycraft.rotate_right": "Rotate 90° (Yaw) Right",
-  "category.isometrycraft.general": "Isometric"
+  "key.isometrycraft.rotate_left": "Rotate 45° Left",
+  "key.isometrycraft.rotate_right": "Rotate 45° Right",
+  "key.isometrycraft.pitch_up": "Increase Isometric Pitch",
+  "key.isometrycraft.pitch_down": "Decrease Isometric Pitch",
+  "key.isometrycraft.open_config": "Open IsometryCraft Settings",
+  "key.category.isometrycraft.general": "IsometryCraft"
 }

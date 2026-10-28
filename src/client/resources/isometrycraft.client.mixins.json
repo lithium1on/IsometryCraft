@@ -1,20 +1,15 @@
 {
   "required": true,
   "package": "com.bryce.mixin",
-  "compatibilityLevel": "JAVA_17",
-  "mixins": [
-    "PlayerEntityMixin"
-  ],
+  "compatibilityLevel": "JAVA_25",
   "client": [
     "CameraMixin",
-    "ClientPlayerInteractionManagerMixin",
-    "FrustumMixin",
-    "GameRendererMixin",
-    "InGameHudMixin",
-    "KeyboardInputMixin",
     "MouseMixin"
   ],
   "injectors": {
     "defaultRequire": 1
-	}
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
 }

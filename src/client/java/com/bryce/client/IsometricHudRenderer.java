@@ -1,76 +1,57 @@
 package com.bryce.client;
 
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.text.Text;
+import com.bryce.IsometryCraft;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.network.chat.Component;
 
-public class IsometricHudRenderer implements HudRenderCallback {
-
-    @Override
-    public void onHudRender(DrawContext drawContext, RenderTickCounter tickCounter) {
-        if (!IsometryCraftClient.isIsometric || !IsometryCraftClient.showHud) return;
-
-        MinecraftClient client = MinecraftClient.getInstance();
-        if (client == null || client.options.hudHidden || client.player == null) return;
-
-        TextRenderer textRenderer = client.textRenderer;
-
-        int xOffset = 10;
-        int yOffset = 10;
-        int lineHeight = 12;
-
-        drawContext.drawTextWithShadow(textRenderer, Text.literal("§6§lIsometryCraft HUD"), xOffset, yOffset, 0xFFFFFF);
-        yOffset += lineHeight;
-
-        String yawText = String.format("Yaw: %.1f° (Target: %.1f°)", IsometryCraftClient.cameraYaw, IsometryCraftClient.targetYaw);
-        drawContext.drawTextWithShadow(textRenderer, Text.literal("§7" + yawText), xOffset, yOffset, 0xFFFFFF);
-        yOffset += lineHeight;
-
-        String pitchText = String.format("Pitch: %.1f°", IsometryCraftClient.cameraPitch);
-        drawContext.drawTextWithShadow(textRenderer, Text.literal("§7" + pitchText), xOffset, yOffset, 0xFFFFFF);
-        yOffset += lineHeight;
-
-        String sizeText = String.format("Size: %.1f", IsometryCraftClient.isometricSize);
-        drawContext.drawTextWithShadow(textRenderer, Text.literal("§7" + sizeText), xOffset, yOffset, 0xFFFFFF);
-        yOffset += lineHeight;
-
-        String yLockStatus = IsometryCraftClient.isYLocked ? String.format("§aLocked (%.2f)", IsometryCraftClient.lockedYValue) : "§cUnlocked";
-        drawContext.drawTextWithShadow(textRenderer, Text.literal("§7Y-Lock: " + yLockStatus), xOffset, yOffset, 0xFFFFFF);
-
-        int screenWidth = drawContext.getScaledWindowWidth();
-        int compassCenterX = screenWidth - 55;
-        int compassCenterY = 40;
-
-        int radiusX = 32;
-        int radiusY = 16;
-
-        float cameraYaw = IsometryCraftClient.cameraYaw;
-
-        drawDirectionMarker(drawContext, textRenderer, "N", 180.0F, cameraYaw, compassCenterX, compassCenterY, radiusX, radiusY, 0xFFFFFF00); // Gold highlights North
-        drawDirectionMarker(drawContext, textRenderer, "E", 270.0F, cameraYaw, compassCenterX, compassCenterY, radiusX, radiusY, 0xFFFFFFFF);
-        drawDirectionMarker(drawContext, textRenderer, "S", 0.0F, cameraYaw, compassCenterX, compassCenterY, radiusX, radiusY, 0xFFFFFFFF);
-        drawDirectionMarker(drawContext, textRenderer, "W", 90.0F, cameraYaw, compassCenterX, compassCenterY, radiusX, radiusY, 0xFFFFFFFF);
-
-        int innerRadiusX = radiusX - 4;
-        int innerRadiusY = radiusY - 2;
-        drawDirectionMarker(drawContext, textRenderer, "o", 135.0F, cameraYaw, compassCenterX, compassCenterY, innerRadiusX, innerRadiusY, 0xFFBBBBBB);
-        drawDirectionMarker(drawContext, textRenderer, "o", 225.0F, cameraYaw, compassCenterX, compassCenterY, innerRadiusX, innerRadiusY, 0xFFBBBBBB);
-        drawDirectionMarker(drawContext, textRenderer, "o", 315.0F, cameraYaw, compassCenterX, compassCenterY, innerRadiusX, innerRadiusY, 0xFFBBBBBB);
-        drawDirectionMarker(drawContext, textRenderer, "o", 45.0F, cameraYaw, compassCenterX, compassCenterY, innerRadiusX, innerRadiusY, 0xFFBBBBBB);
+public final class IsometricHudRenderer {
+    private IsometricHudRenderer() {
     }
 
-    private void drawDirectionMarker(DrawContext drawContext, TextRenderer textRenderer, String marker, float directionYaw, float cameraYaw, int centerX, int centerY, int radiusX, int radiusY, int color) {
-        double angleRad = Math.toRadians(directionYaw - cameraYaw - 90.0F);
+    public static void register() {
+        HudElementRegistry.attachElementAfter(
+                VanillaHudElements.MISC_OVERLAYS,
+                IsometryCraft.id("isometric_hud"),
+                IsometricHudRenderer::extract
+        );
+    }
 
-        int posX = centerX + (int) (radiusX * Math.cos(angleRad));
-        int posY = centerY + (int) (radiusY * Math.sin(angleRad));
+    private static void extract(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
+        if (!IsometryCraftClient.isIsometric || !IsometryCraftClient.showHud) {
+            return;
+        }
 
-        int textWidth = textRenderer.getWidth(marker);
-        int textHeight = textRenderer.fontHeight;
+        Minecraft client = Minecraft.getInstance();
+        if (client.player == null || client.options.hideGui) {
+            return;
+        }
 
-        drawContext.drawTextWithShadow(textRenderer, Text.literal(marker), posX - textWidth / 2, posY - textHeight / 2, color);
+        int x = 10;
+        int y = 10;
+        int line = 12;
+        graphics.text(client.font, Component.literal("IsometryCraft"), x, y, 0xFFFFC857);
+        y += line;
+        graphics.text(client.font,
+                Component.literal(String.format("Yaw: %.1f° (target %.1f°)",
+                        IsometryCraftClient.cameraYaw, IsometryCraftClient.targetYaw)),
+                x, y, 0xFFE0E0E0);
+        y += line;
+        graphics.text(client.font,
+                Component.literal(String.format("Pitch: %.1f°", IsometryCraftClient.cameraPitch)),
+                x, y, 0xFFE0E0E0);
+        y += line;
+        graphics.text(client.font,
+                Component.literal(String.format("Zoom: %.1f", IsometryCraftClient.isometricSize)),
+                x, y, 0xFFE0E0E0);
+        y += line;
+        graphics.text(client.font,
+                Component.literal(IsometryCraftClient.isYLocked
+                        ? String.format("Y-lock: %.1f", IsometryCraftClient.lockedYValue)
+                        : "Y-lock: off"),
+                x, y, 0xFFE0E0E0);
     }
 }
