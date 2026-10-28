@@ -1,19 +1,20 @@
 package com.bryce.mixin;
 
 import com.bryce.client.IsometryCraftClient;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.network.ClientPlayerInteractionManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.MultiPlayerGameMode;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.util.Mth;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -23,62 +24,70 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(ClientPlayerInteractionManager.class)
-public class ClientPlayerInteractionManagerMixin {
-
-    @Shadow @Final
-    private MinecraftClient client;
+@Mixin(MultiPlayerGameMode.class)
+public abstract class ClientPlayerInteractionManagerMixin {
+    @Shadow @Final private Minecraft minecraft;
 
     @Unique
-    private void isometrycraft$lookAt(Vec3d targetPos) {
-        if (!IsometryCraftClient.isIsometric || this.client.player == null) {
+    private void isometrycraft$lookAt(Vec3 targetPos) {
+        if (!IsometryCraftClient.isIsometric || this.minecraft.player == null) {
             return;
         }
-        ClientPlayerEntity player = this.client.player;
 
+        LocalPlayer player = this.minecraft.player;
         double dx = targetPos.x - player.getX();
         double dy = targetPos.y - player.getEyeY();
         double dz = targetPos.z - player.getZ();
-        double dh = Math.sqrt(dx * dx + dz * dz);
+        double horizontalDistance = Math.sqrt(dx * dx + dz * dz);
 
-        float yaw = MathHelper.wrapDegrees((float) (Math.toDegrees(Math.atan2(dz, dx)) - 90.0));
-        float pitch = MathHelper.wrapDegrees((float) (-Math.toDegrees(Math.atan2(dy, dh))));
+        float yaw = Mth.wrapDegrees((float) (Math.toDegrees(Math.atan2(dz, dx)) - 90.0));
+        float pitch = Mth.wrapDegrees((float) -Math.toDegrees(Math.atan2(dy, horizontalDistance)));
 
-        player.setYaw(yaw);
-        player.setPitch(pitch);
+        player.setYRot(yaw);
+        player.setXRot(pitch);
 
-        if (this.client.getNetworkHandler() != null) {
-            this.client.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(yaw, pitch, player.isOnGround()));
+        // The interaction packet can reach the server before the next regular player
+        // movement update. Send the intended look first so server-side reach/LOS
+        // validation uses the block or entity selected from the isometric camera.
+        if (this.minecraft.getConnection() != null) {
+            this.minecraft.getConnection().send(new ServerboundMovePlayerPacket.Rot(
+                    yaw, pitch, player.onGround(), player.horizontalCollision));
         }
     }
 
-    @Inject(method = "interactBlock", at = @At("HEAD"))
-    private void isometrycraft$onInteractBlock(ClientPlayerEntity player, Hand hand, BlockHitResult hitResult, CallbackInfoReturnable<ActionResult> cir) {
-        this.isometrycraft$lookAt(hitResult.getPos());
+    @Inject(method = "useItemOn", at = @At("HEAD"))
+    private void isometrycraft$onUseBlock(
+            LocalPlayer player, InteractionHand hand, BlockHitResult hitResult,
+            CallbackInfoReturnable<InteractionResult> cir) {
+        this.isometrycraft$lookAt(hitResult.getLocation());
     }
 
-    @Inject(method = "interactEntity", at = @At("HEAD"))
-    private void isometrycraft$onInteractEntity(PlayerEntity player, Entity entity, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
-        this.isometrycraft$lookAt(entity.getPos());
+    @Inject(method = "interact", at = @At("HEAD"))
+    private void isometrycraft$onInteractEntity(
+            Player player, Entity entity, EntityHitResult hitResult, InteractionHand hand,
+            CallbackInfoReturnable<InteractionResult> cir) {
+        this.isometrycraft$lookAt(hitResult.getLocation());
     }
 
-    @Inject(method = "attackEntity", at = @At("HEAD"))
-    private void isometrycraft$onAttackEntity(PlayerEntity player, Entity target, CallbackInfo ci) {
-        this.isometrycraft$lookAt(target.getPos());
+    @Inject(method = "attack", at = @At("HEAD"))
+    private void isometrycraft$onAttackEntity(Player player, Entity target, CallbackInfo ci) {
+        this.isometrycraft$lookAt(target.position());
     }
 
-    @Inject(method = "breakBlock", at = @At("HEAD"))
-    private void isometrycraft$onBreakBlock(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        this.isometrycraft$lookAt(Vec3d.ofCenter(pos));
+    @Inject(method = "destroyBlock", at = @At("HEAD"))
+    private void isometrycraft$onDestroyBlock(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+        this.isometrycraft$lookAt(Vec3.atCenterOf(pos));
     }
 
-    @Inject(method = "attackBlock", at = @At("HEAD"))
-    private void isometrycraft$onAttackBlock(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
-        this.isometrycraft$lookAt(Vec3d.ofCenter(pos));
+    @Inject(method = "startDestroyBlock", at = @At("HEAD"))
+    private void isometrycraft$onStartDestroyBlock(
+            BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
+        this.isometrycraft$lookAt(Vec3.atCenterOf(pos));
     }
 
-    @Inject(method = "updateBlockBreakingProgress", at = @At("HEAD"))
-    private void isometrycraft$onUpdateBlockBreakingProgress(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
-        this.isometrycraft$lookAt(Vec3d.ofCenter(pos));
+    @Inject(method = "continueDestroyBlock", at = @At("HEAD"))
+    private void isometrycraft$onContinueDestroyBlock(
+            BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
+        this.isometrycraft$lookAt(Vec3.atCenterOf(pos));
     }
 }
