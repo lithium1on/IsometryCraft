@@ -4,9 +4,13 @@
   "compatibilityLevel": "JAVA_25",
   "client": [
     "CameraMixin",
+    "ClientPlayerInteractionManagerMixin",
     "FrustumMixin",
+    "GameRendererMixin",
+    "KeyboardInputMixin",
     "MinecraftPickMixin",
-    "MouseMixin"
+    "MouseMixin",
+    "PlayerEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1
