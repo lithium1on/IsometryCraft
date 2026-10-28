@@ -26,7 +26,8 @@ public final class IsometricHudRenderer {
         }
 
         Minecraft client = Minecraft.getInstance();
-        if (client.player == null || client.options.hideGui) {
+        // Avoid drawing over other screens such as the inventory or pause menu.
+        if (client.player == null || client.gui.screen() != null) {
             return;
         }
 

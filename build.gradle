@@ -33,12 +33,12 @@ dependencies {
     implementation "net.fabricmc:fabric-loader:${project.loader_version}"
     implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
-    modImplementation("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") {
+    modClientImplementation("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") {
         exclude(group: "net.fabricmc.fabric-api")
     }
-    // Mod Menu is optional at runtime, but is needed on the compile classpath
+    // Mod Menu is optional at runtime, but is needed on the client compile classpath
     // for its configuration-screen entrypoint.
-    modCompileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
+    modClientCompileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
 }
 
 processResources {
