@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(MouseHandler.class)
 public abstract class MouseMixin {
@@ -23,6 +24,13 @@ public abstract class MouseMixin {
     private void isometrycraft$keepCursorFree(CallbackInfo ci) {
         if (IsometryCraftClient.isIsometric) {
             ci.cancel();
+        }
+    }
+
+    @Inject(method = "isMouseGrabbed", at = @At("HEAD"), cancellable = true)
+    private void isometrycraft$reportMouseGrabbed(CallbackInfoReturnable<Boolean> cir) {
+        if (IsometryCraftClient.isIsometric) {
+            cir.setReturnValue(true);
         }
     }
 
