@@ -39,7 +39,7 @@ public abstract class MinecraftPickMixin {
             return;
         }
 
-        Camera camera = client.gameRenderer.getMainCamera();
+        Camera camera = client.gameRenderer.mainCamera();
         Window window = client.getWindow();
         int width = window.getScreenWidth();
         int height = window.getScreenHeight();
