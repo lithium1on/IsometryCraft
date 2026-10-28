@@ -1,8 +1,8 @@
 package com.bryce.mixin;
 
 import com.bryce.client.IsometryCraftClient;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Camera;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.util.Mth;
@@ -11,7 +11,6 @@ import net.minecraft.world.level.Level;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -70,7 +69,7 @@ public abstract class CameraMixin {
 
     @Inject(method = "extractRenderState", at = @At("TAIL"))
     private void isometrycraft$setOrthographicProjection(
-            CameraRenderState cameraState, float cameraEntityPartialTicks, CallbackInfo ci) {
+            CameraRenderState cameraState, DeltaTracker deltaTracker, CallbackInfo ci) {
         if (!IsometryCraftClient.isIsometric) {
             return;
         }
