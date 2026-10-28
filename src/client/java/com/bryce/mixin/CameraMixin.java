@@ -74,6 +74,10 @@ public abstract class CameraMixin {
             return;
         }
 
+        // This is an isometric orbit camera, so explicitly render the local player
+        // body instead of leaving the render state marked as first-person.
+        cameraState.isFirstPerson = false;
+
         Minecraft client = Minecraft.getInstance();
         int width = client.getWindow().getWidth();
         int height = client.getWindow().getHeight();
