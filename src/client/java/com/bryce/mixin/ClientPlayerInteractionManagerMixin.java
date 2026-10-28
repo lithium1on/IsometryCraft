@@ -51,7 +51,7 @@ public abstract class ClientPlayerInteractionManagerMixin {
         // validation uses the block or entity selected from the isometric camera.
         if (this.minecraft.getConnection() != null) {
             this.minecraft.getConnection().send(new ServerboundMovePlayerPacket.Rot(
-                    yaw, pitch, player.onGround(), player.horizontalCollision()));
+                    yaw, pitch, player.onGround(), player.horizontalCollision));
         }
     }
 
