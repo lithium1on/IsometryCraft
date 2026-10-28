@@ -91,7 +91,7 @@ public class IsometryCraftClient implements ClientModInitializer {
             }
 
             while (openConfigKey.consumeClick()) {
-                client.setScreen(IsometryCraftConfigScreen.createScreen(client.gui.screen()));
+                client.gui.setScreen(IsometryCraftConfigScreen.createScreen(client.gui.screen()));
             }
 
             while (toggleKey.consumeClick()) {
@@ -148,7 +148,7 @@ public class IsometryCraftClient implements ClientModInitializer {
 
     private static KeyMapping registerKey(String translationKey, int keyCode) {
         return KeyMappingHelper.registerKeyMapping(
-                new KeyMapping(translationKey, InputConstants.Type.KEYSYM, keyCode, KEY_CATEGORY));
+                new KeyMapping(translationKey, InputConstants.Type.KEYBOARD, keyCode, KEY_CATEGORY));
     }
 
     public static void setIsometric(boolean enabled, Minecraft client) {

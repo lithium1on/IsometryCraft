@@ -4,6 +4,8 @@
   "compatibilityLevel": "JAVA_25",
   "client": [
     "CameraMixin",
+    "FrustumMixin",
+    "MinecraftPickMixin",
     "MouseMixin"
   ],
   "injectors": {

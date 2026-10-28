@@ -8,6 +8,7 @@ A Fabric client mod that lets you experience Minecraft from an isometric perspec
 - Adjustable zoom (mouse wheel while in isometric mode)
 - Toggle between normal and isometric camera
 - Keyboard controls for yaw and pitch
+- Middle-mouse drag to pan
 - Optional camera-height lock and HUD overlay
 - Configuration screen supplied by Cloth Config and exposed through Mod Menu
 
@@ -16,17 +17,19 @@ A Fabric client mod that lets you experience Minecraft from an isometric perspec
 - Minecraft Java Edition 26.3
 - Java 25
 - Fabric Loader and Fabric API for 26.3
-- Cloth Config API 26.3.159+fabric
+- Cloth Config API 26.3.159
 - Mod Menu 21.0.0 (optional, for the Mods menu entry)
 
 ## Controls
 
-| Key | Action |
+| Key / input | Action |
 | --- | --- |
 | I | Toggle isometric view |
 | Y | Toggle camera height lock |
 | Left / Right Arrow | Rotate by 45 degrees |
 | Up / Down Arrow | Change camera pitch |
 | O | Open configuration |
+| Mouse wheel | Zoom in/out |
+| Hold middle mouse and drag | Pan the view |
 
 The configuration screen is available from Mod Menu when it is installed. Settings are stored in `config/isometrycraft_client.json`.

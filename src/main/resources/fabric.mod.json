@@ -14,7 +14,7 @@
   },
   "license": "MIT",
   "icon": "assets/isometrycraft/icon.png",
-  "environment": "*",
+  "environment": "client",
   "entrypoints": {
     "main": [
       "com.bryce.IsometryCraft"
